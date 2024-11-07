@@ -80,27 +80,36 @@ const Catalogo = () => {
               className="material-image"
             />
             {editingMaterialId === material.id_material ? (
-              <div>
-                <input
-                  type="text"
-                  name="nombre"
-                  value={formValues.nombre}
-                  onChange={handleChange}
-                />
-                <input
-                  type="number"
-                  name="metros_disponibles"
-                  value={formValues.metros_disponibles}
-                  onChange={handleChange}
-                />
-                <input
-                  type="number"
-                  name="precio"
-                  value={formValues.precio}
-                  onChange={handleChange}
-                />
-                <button onClick={() => handleGuardar(material.id_material)}>Guardar</button>
-                <button onClick={() => setEditingMaterialId(null)}>Cancelar</button>
+              <div className="edit-form">
+                <label>
+                  Nombre:
+                  <input
+                    type="text"
+                    name="nombre"
+                    value={formValues.nombre}
+                    onChange={handleChange}
+                  />
+                </label>
+                <label>
+                  Metros Disponibles:
+                  <input
+                    type="number"
+                    name="metros_disponibles"
+                    value={formValues.metros_disponibles}
+                    onChange={handleChange}
+                  />
+                </label>
+                <label>
+                  Precio:
+                  <input
+                    type="number"
+                    name="precio"
+                    value={formValues.precio}
+                    onChange={handleChange}
+                  />
+                </label>
+                <button onClick={() => handleGuardar(material.id_material)} className="save-button">Guardar</button>
+                <button onClick={() => setEditingMaterialId(null)} className="cancel-button">Cancelar</button>
               </div>
             ) : (
               <div>

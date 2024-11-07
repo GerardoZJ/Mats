@@ -1,4 +1,3 @@
-// AuthContext.jsx
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 
@@ -6,7 +5,7 @@ const AuthContext = createContext();
 
 export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
-  const [loading, setLoading] = useState(true); // Estado de carga
+  const [loading, setLoading] = useState(true); 
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -14,19 +13,19 @@ export const AuthProvider = ({ children }) => {
     if (storedUser) {
       setUser(JSON.parse(storedUser));
     }
-    setLoading(false); // Finaliza la carga después de comprobar `localStorage`
+    setLoading(false); 
   }, []);
 
   const login = (userData) => {
     setUser(userData);
     localStorage.setItem('user', JSON.stringify(userData));
-    navigate('/Catalogo'); // Redirigir al catálogo después de iniciar sesión
+    navigate('/Catalogo'); 
   };
 
   const logout = () => {
     setUser(null);
     localStorage.removeItem('user');
-    navigate('/'); // Redirigir al catálogo después de cerrar sesión
+    navigate('/'); 
   };
 
   const isAuthenticated = !!user;
@@ -38,5 +37,5 @@ export const AuthProvider = ({ children }) => {
   );
 };
 
-// Hook personalizado para usar el contexto
+
 export const useAuth = () => useContext(AuthContext);

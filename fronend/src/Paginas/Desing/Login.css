@@ -1,14 +1,14 @@
-/* Estructura de pantalla dividida */
+
 .login-page {
   display: flex;
   min-height: 100vh;
   font-family: Arial, sans-serif;
 }
 
-/* Sección izquierda con el logo y el texto */
+
 .login-left {
   flex: 1;
-  background-color: rgba(115, 96, 96, 0.222); /* Color de fondo suave */
+  background-color: rgba(115, 96, 96, 0.222); 
   display: flex;
   flex-direction: column;
   justify-content: center;
@@ -26,7 +26,7 @@
 
 .login-left h2 {
   font-size: 2rem;
-  color: #d9d4d4; /* Color de marca */
+  color: #d9d4d4; 
   margin-bottom: 10px;
 }
 
@@ -36,7 +36,7 @@
   color: #dad0d0;
 }
 
-/* Sección derecha con el formulario */
+
 .login-right {
   flex: 1;
   background-color: rgba(210, 199, 199, 0.83);
@@ -54,7 +54,7 @@
   margin-bottom: 20px;
 }
 
-/* Estilos del formulario */
+
 .login-right form {
   display: flex;
   flex-direction: column;
@@ -62,7 +62,7 @@
   max-width: 300px;
 }
 
-/* Grupo de input */
+
 .input-group {
   margin-bottom: 15px;
   text-align: left;
@@ -86,7 +86,7 @@
   outline: none;
 }
 
-/* Botón de inicio de sesión */
+
 .login-button {
   padding: 12px;
   background-color: #ff4d4d;
@@ -102,7 +102,7 @@
   background-color: #d42a2a;
 }
 
-/* Mensaje de error */
+
 .error-message {
   color: red;
   font-size: 0.9rem;

@@ -1,6 +1,6 @@
-/* Contenedor del navbar */
+
 nav {
-  background: linear-gradient(90deg, #a81f4657, #d73a64c3); /* Fondo degradado similar */
+  background: linear-gradient(90deg, #a81f4657, #d73a64c3); 
   padding: 1rem 2rem;
   display: flex;
   justify-content: space-between;
@@ -24,7 +24,7 @@ nav .logo img {
 nav ul {
   list-style: none;
   display: flex;
-  gap: 30px; /* Más espaciado entre elementos */
+  gap: 30px; 
   margin: 0;
   padding: 0;
 }

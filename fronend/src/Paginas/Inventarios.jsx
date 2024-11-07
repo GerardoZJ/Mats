@@ -92,7 +92,7 @@ const Inventarios = () => {
                     </select>
                     <input
                         type="number"
-                        placeholder="Cantidad"
+                        placeholder="Cantidad de metros"
                         value={cantidad}
                         onChange={(e) => setCantidad(e.target.value)}
                         required

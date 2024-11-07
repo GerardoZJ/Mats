@@ -1,4 +1,4 @@
-/* ReportesDesing.css */
+
 
 .reportes-container {
     max-width: 1800px;
@@ -96,5 +96,13 @@
 }
 
 .historial-item:nth-child(even) {
-    background-color: #f9f9f9; /* Fondo alternado */
+    background-color: #f9f9f9; 
+}
+.texto-negro {
+  color: #333;
+  font-weight: bold; 
+}
+.texto{
+  color: #333;
+  font-weight: bold;
 }

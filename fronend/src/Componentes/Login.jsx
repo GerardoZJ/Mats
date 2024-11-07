@@ -37,7 +37,7 @@ const Login = () => {
       <div className="login-left">
       <img src="/Logo.png" alt="Materiales Rojo" className="login-logo" />
         <h2>Bienvenido a Materiales Rojo</h2>
-        <p>Donde encuentras todo lo que necesitas para la construcción</p>
+   
       </div>
       <div className="login-right">
         <h1>Inicio de Sesión</h1>

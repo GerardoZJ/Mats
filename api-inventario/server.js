@@ -7,12 +7,12 @@ const path = require('path');
 const app = express();
 const port = 3000;
 
-// Middleware
+
 app.use(express.json());
 app.use(cors());
 app.use('/uploads', express.static('uploads'));
 
-// Configuración del pool de conexiones de la base de datos
+
 const pool = mysql.createPool({
     host: 'srv1247.hstgr.io',
     user: 'u475816193_Inventario',
@@ -23,7 +23,7 @@ const pool = mysql.createPool({
     queueLimit: 0
 });
 
-// Configuración de multer para el almacenamiento de imágenes
+
 const storage = multer.diskStorage({
     destination: (req, file, cb) => {
         cb(null, 'uploads/');
@@ -34,7 +34,7 @@ const storage = multer.diskStorage({
 });
 const upload = multer({ storage: storage });
 
-// Endpoint de login para autenticar usuarios
+// Endpoint de login 
 app.post('/login', (req, res) => {
     const { Usuario, contraseña } = req.body;
 
@@ -57,7 +57,7 @@ app.post('/login', (req, res) => {
     });
 });
 
-// Endpoint para agregar materiales con imagen
+// para agregar materiales con imagen
 app.post('/api/materiales', upload.single('imagen'), (req, res) => {
     const { nombre, metros_disponibles, precio } = req.body;
     const imagenPath = req.file ? `/uploads/${req.file.filename}` : null;
@@ -82,7 +82,7 @@ app.post('/api/materiales', upload.single('imagen'), (req, res) => {
     });
 });
 
-// Endpoint para obtener materiales con imagen
+//  para obtener materiales con imagen
 app.get('/api/materiales', (req, res) => {
     const sql = 'SELECT id_material, nombre, metros_disponibles, precio, imagen AS imagen_url FROM Materiales';
     pool.query(sql, (err, results) => {
@@ -99,7 +99,7 @@ app.get('/api/materiales', (req, res) => {
     });
 });
 
-// Endpoint para editar un material
+// editar un material
 app.put('/api/materiales/:id', (req, res) => {
     const { id } = req.params;
     const { nombre, metros_disponibles, precio } = req.body;
@@ -120,18 +120,18 @@ app.put('/api/materiales/:id', (req, res) => {
 });
 
 
-// Endpoint para eliminar material con eliminación de movimientos asociados
+// eliminar material con eliminación de movimientos asociados
 app.delete('/api/materiales/:id', async (req, res) => {
     const { id } = req.params;
     const connection = await pool.promise().getConnection();
     await connection.beginTransaction();
 
     try {
-        // Eliminar movimientos relacionados con el material
+     
         const deleteMovimientosSql = 'DELETE FROM MovimientosInventario WHERE id_material = ?';
         await connection.query(deleteMovimientosSql, [id]);
 
-        // Luego, eliminar el material
+     
         const deleteMaterialSql = 'DELETE FROM Materiales WHERE id_material = ?';
         const [result] = await connection.query(deleteMaterialSql, [id]);
 
@@ -151,7 +151,7 @@ app.delete('/api/materiales/:id', async (req, res) => {
 });
 
 
-// Endpoint para obtener el historial de movimientos
+//  obtener el historial de movimientos
 app.get('/api/movimientos', (req, res) => {
     const sql = 'SELECT id_movimiento, id_material, tipo_movimiento, cantidad, fecha_movimiento, descripcion FROM MovimientosInventario ORDER BY fecha_movimiento DESC';
     pool.query(sql, (err, results) => {
@@ -163,7 +163,7 @@ app.get('/api/movimientos', (req, res) => {
     });
 });
 
-// Endpoint para agregar un nuevo movimiento y actualizar la cantidad de materiales
+//agregar un nuevo movimiento y actualizar la cantidad de materiales
 app.post('/api/movimientos', async (req, res) => {
     const { id_material, tipo_movimiento, cantidad, fecha_movimiento, descripcion } = req.body;
 
@@ -197,7 +197,7 @@ app.post('/api/movimientos', async (req, res) => {
     }
 });
 
-// Endpoint para actualizar un movimiento
+//  para actualizar un movimiento
 app.put('/api/movimientos/:id', (req, res) => {
     const { id } = req.params;
     const { id_material, tipo_movimiento, cantidad, fecha_movimiento, descripcion } = req.body;
@@ -211,7 +211,7 @@ app.put('/api/movimientos/:id', (req, res) => {
     });
 });
 
-// Endpoint para eliminar un movimiento
+// para eliminar un movimiento
 app.delete('/api/movimientos/:id', (req, res) => {
     const { id } = req.params;
     const sql = 'DELETE FROM MovimientosInventario WHERE id_movimiento = ?';
@@ -224,7 +224,7 @@ app.delete('/api/movimientos/:id', (req, res) => {
     });
 });
 
-// Iniciar servidor
+
 app.listen(port, () => {
     console.log(`Servidor corriendo en el puerto: ${port}`);
 });

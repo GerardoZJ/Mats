@@ -4,12 +4,12 @@
 }
 
 h2 {
-    color: #b22222; /* Dark Red */
+    color: #b22222; 
 }
 
 h3 {
     margin-top: 30px;
-    color: #b22222; /* Dark Red */
+    color: #b22222;
 }
 
 .error-message {
@@ -34,16 +34,16 @@ h3 {
 
 .entradas, .salidas {
     width: 48%;
-    border: 1px solid #b22222; /* Dark Red border */
+    border: 1px solid #b22222; 
     border-radius: 5px;
     padding: 10px;
-    background-color: #f8d7da; /* Light Red */
+    background-color: #f8d7da; 
 }
 
 .historial-item {
     margin: 5px 0;
     padding: 5px;
-    border-bottom: 1px solid #f5c6cb; /* Lighter Red */
+    border-bottom: 1px solid #f5c6cb; 
 }
 
 .historial-item:last-child {

@@ -1,6 +1,5 @@
-/* Fondo de la página */
 body {
-  background-image: url('../../../public/fondo5.jpg'); /* Cambia esta ruta si es necesario */
+  background-image: url('../../../public/fondo5.jpg');
   background-size: cover;
   background-attachment: fixed;
   background-position: center;
@@ -8,7 +7,14 @@ body {
   font-family: Arial, sans-serif;
 }
 
-/* Contenedor principal del catálogo */
+@media (max-width: 576px) {
+  body {
+    font-size: 0.9rem;
+  }
+}
+
+
+
 .catalogo-container {
   max-width: 1200px;
   margin: 40px auto;
@@ -16,7 +22,6 @@ body {
   text-align: center;
 }
 
-/* Contenedor del catálogo de productos */
 .catalogo {
   display: flex;
   flex-wrap: wrap;
@@ -24,9 +29,8 @@ body {
   gap: 20px;
 }
 
-/* Estilo de las tarjetas de productos */
 .material-card {
-  background-color: rgba(255, 255, 255, 0.1); /* Fondo ligero para destacar el producto */
+  background-color: rgba(255, 255, 255, 0.1);
   color: white;
   border-radius: 8px;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
@@ -36,26 +40,29 @@ body {
   transition: transform 0.3s ease, box-shadow 0.3s ease;
 }
 
-.material-card:hover {
-  transform: scale(1.05);
-  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.5);
-}
-
-/* Imagen del material */
 .material-image {
   width: 100%;
   border-radius: 5px;
   margin-bottom: 15px;
 }
 
-/* Nombre del material */
+@media (max-width: 768px) {
+  .catalogo-container {
+    padding: 10px;
+  }
+  .material-card {
+    width: 90%;
+  }
+}
+
+
 .material-name {
   font-size: 1.5rem;
   color: #ff4d4d;
   margin-bottom: 10px;
 }
 
-/* Botones de acción */
+
 .actions button {
   background-color: #ff4d4d;
   color: white;
@@ -69,4 +76,22 @@ body {
 
 .actions button:hover {
   background-color: #d42a2a;
+}
+.edit-form {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-top: 10px;
+}
+
+.edit-form label {
+  display: flex;
+  flex-direction: column;
+  font-weight: bold;
+  color: #f5eded;
+}
+
+.save-button,
+.cancel-button {
+  margin-top: 10px;
 }

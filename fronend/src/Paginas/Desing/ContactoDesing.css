@@ -2,15 +2,15 @@
     display: flex;
     justify-content: center;
     align-items: center;
-    min-height: calc(100vh - 80px); /* Ajusta según la altura de tu navbar */
+    min-height: calc(100vh - 80px); 
     padding: 20px;
   }
   
   .contacto-split-container {
     display: flex;
-    width: 90%; /* Ajusta el ancho general */
-    max-width: 1400px; /* Tamaño máximo para pantallas grandes */
-    height: 80vh; /* Ocupa el 80% de la altura de la ventana */
+    width: 90%; 
+    max-width: 1400px; 
+    height: 80vh;
     border-radius: 12px;
     overflow: hidden;
     box-shadow: 0px 4px 12px rgba(0, 0, 0, 0.2);
@@ -64,7 +64,7 @@
     flex-direction: column;
     justify-content: center;
     padding: 40px;
-    background-color: #fff;
+    background-color: rgba(248, 242, 242, 0.1);
   }
   
   .contacto-info-section h2 {
@@ -79,4 +79,40 @@
     margin: 10px 0;
     line-height: 1.6;
   }
+  .facebook-link {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    color: #4267B2;
+    text-decoration: none;
+    margin-top: 10px;
+    font-weight: bold;
+  }
   
+  .facebook-link:hover {
+    color: #365899; 
+  }
+  
+  .facebook-link svg {
+    transition: transform 0.3s ease;
+  }
+  
+  .facebook-link:hover svg {
+    transform: scale(1.1);
+  }
+  
+  .contacto-info-section {
+    width: 50%;
+    padding: 40px;
+    background-color: rgba(248, 242, 242, 0.1);
+  }
+  
+  @media (max-width: 768px) {
+    .contacto-split-container {
+      flex-direction: column;
+      height: auto;
+    }
+    .contacto-image-section, .contacto-info-section {
+      width: 100%;
+    }
+  }

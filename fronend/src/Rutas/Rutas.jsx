@@ -5,9 +5,9 @@ import Nav from '../Paginas/Nav';
 import Crear from '../Paginas/Crear';
 import Inventarios from '../Paginas/Inventarios';
 import Login from '../Componentes/Login';
-import Contacto from '../Paginas/Contacto'; // Importa el componente Contacto
+import Contacto from '../Paginas/Contacto'; 
 import ProtectedRoute from '../Componentes/Private';
-import Reportes from '../Paginas/Reportes'; // Importa el componente Reportes
+import Reportes from '../Paginas/Reportes';
 
 
 const Rutas = () => {
@@ -17,10 +17,10 @@ const Rutas = () => {
         <Route path='/' element={<Nav />}>
           <Route path='/' element={<Catalogo />} />
           <Route path='/Catalogo' element={<Catalogo />} />
-          <Route path='/Contacto' element={<Contacto />} /> {/* Nueva ruta de contacto */}
+          <Route path='/Contacto' element={<Contacto />} /> {}
           <Route path='/Crear' element={<ProtectedRoute><Crear /></ProtectedRoute>} />
           <Route path='/Inventarios' element={<ProtectedRoute><Inventarios /></ProtectedRoute>} />
-          <Route path='/Reportes' element={<ProtectedRoute><Reportes /></ProtectedRoute>} /> {/* Nueva ruta de Reportes */}
+          <Route path='/Reportes' element={<ProtectedRoute><Reportes /></ProtectedRoute>} /> {}
           <Route path='/Login' element={<Login />} />
         </Route>
       </Routes>
