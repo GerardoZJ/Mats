@@ -1,4 +1,3 @@
-
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 import './Desing/ReportesDesing.css';
@@ -23,43 +22,28 @@ const Reportes = () => {
     }
   };
 
+  // Convertir fecha UTC de la base de datos a la zona horaria local
+  const ajustarFechaAUsuario = (fechaUTC) => {
+    const fechaLocal = new Date(fechaUTC);
+    return fechaLocal.toLocaleDateString('es-ES');
+  };
+
   const manejarFiltroPorFechaExacta = () => {
     if (!fechaExacta) {
       alert("Por favor selecciona una fecha.");
       return;
     }
 
-    const fechaSeleccionada = new Date(fechaExacta);
-    const fechaSeleccionadaUTC = new Date(Date.UTC(
-      fechaSeleccionada.getFullYear(),
-      fechaSeleccionada.getMonth(),
-      fechaSeleccionada.getDate()
-    ));
+    const fechaSeleccionada = new Date(fechaExacta).toLocaleDateString('es-ES');
 
     const entradas = reportes.filter((reporte) => {
-      const fechaMovimiento = new Date(reporte.fecha_movimiento);
-      const fechaMovimientoUTC = new Date(Date.UTC(
-        fechaMovimiento.getFullYear(),
-        fechaMovimiento.getMonth(),
-        fechaMovimiento.getDate()
-      ));
-      return (
-        reporte.tipo_movimiento === 'entrada' &&
-        fechaMovimientoUTC.getTime() === fechaSeleccionadaUTC.getTime()
-      );
+      const fechaMovimiento = new Date(reporte.fecha_movimiento).toLocaleDateString('es-ES');
+      return reporte.tipo_movimiento === 'entrada' && fechaMovimiento === fechaSeleccionada;
     });
 
     const salidas = reportes.filter((reporte) => {
-      const fechaMovimiento = new Date(reporte.fecha_movimiento);
-      const fechaMovimientoUTC = new Date(Date.UTC(
-        fechaMovimiento.getFullYear(),
-        fechaMovimiento.getMonth(),
-        fechaMovimiento.getDate()
-      ));
-      return (
-        reporte.tipo_movimiento === 'salida' &&
-        fechaMovimientoUTC.getTime() === fechaSeleccionadaUTC.getTime()
-      );
+      const fechaMovimiento = new Date(reporte.fecha_movimiento).toLocaleDateString('es-ES');
+      return reporte.tipo_movimiento === 'salida' && fechaMovimiento === fechaSeleccionada;
     });
 
     if (entradas.length === 0 && salidas.length === 0) {
@@ -71,18 +55,18 @@ const Reportes = () => {
   };
 
   const manejarFiltroPeriodico = () => {
-    const hoy = new Date().setHours(0, 0, 0, 0);
+    const hoy = new Date();
     let fechaInicio;
 
     switch (tipoFiltro) {
       case 'Dia':
-        fechaInicio = hoy;
+        fechaInicio = new Date(hoy.setHours(0, 0, 0, 0));
         break;
       case 'Semana':
-        fechaInicio = new Date(new Date().setDate(new Date().getDate() - 7)).setHours(0, 0, 0, 0);
+        fechaInicio = new Date(hoy.setDate(hoy.getDate() - 7)).setHours(0, 0, 0, 0);
         break;
       case 'Mes':
-        fechaInicio = new Date(new Date().setDate(new Date().getDate() - 30)).setHours(0, 0, 0, 0);
+        fechaInicio = new Date(hoy.setDate(hoy.getDate() - 30)).setHours(0, 0, 0, 0);
         break;
       default:
         return;
@@ -91,13 +75,13 @@ const Reportes = () => {
     const entradas = reportes.filter(
       (reporte) =>
         reporte.tipo_movimiento === 'entrada' &&
-        new Date(reporte.fecha_movimiento).setHours(0, 0, 0, 0) >= fechaInicio
+        new Date(reporte.fecha_movimiento).getTime() >= fechaInicio
     );
 
     const salidas = reportes.filter(
       (reporte) =>
         reporte.tipo_movimiento === 'salida' &&
-        new Date(reporte.fecha_movimiento).setHours(0, 0, 0, 0) >= fechaInicio
+        new Date(reporte.fecha_movimiento).getTime() >= fechaInicio
     );
 
     setEntradasFiltradas(entradas);
@@ -139,6 +123,7 @@ const Reportes = () => {
                 <th>Producto</th>
                 <th>Fecha</th>
                 <th>Cantidad</th>
+                <th>Realizado por</th>
               </tr>
             </thead>
             <tbody>
@@ -146,14 +131,15 @@ const Reportes = () => {
                 entradasFiltradas.map((reporte) => (
                   <tr key={reporte.id_movimiento}>
                     <td>{reporte.id_movimiento}</td>
-                    <td>{reporte.id_material}</td>
-                    <td>{new Date(reporte.fecha_movimiento).toLocaleDateString()}</td>
+                    <td>{reporte.nombre_material || 'Desconocido'}</td>
+                    <td>{ajustarFechaAUsuario(reporte.fecha_movimiento)}</td>
                     <td>{reporte.cantidad}</td>
+                    <td>{reporte.nombre_admin || 'N/A'}</td>
                   </tr>
                 ))
               ) : (
                 <tr>
-                  <td colSpan="4">No hay reportes disponibles</td>
+                  <td colSpan="5">No hay reportes disponibles</td>
                 </tr>
               )}
             </tbody>
@@ -169,6 +155,7 @@ const Reportes = () => {
                 <th>Producto</th>
                 <th>Fecha</th>
                 <th>Cantidad</th>
+                <th>Realizado por</th>
               </tr>
             </thead>
             <tbody>
@@ -176,14 +163,15 @@ const Reportes = () => {
                 salidasFiltradas.map((reporte) => (
                   <tr key={reporte.id_movimiento}>
                     <td>{reporte.id_movimiento}</td>
-                    <td>{reporte.id_material}</td>
-                    <td>{new Date(reporte.fecha_movimiento).toLocaleDateString()}</td>
+                    <td>{reporte.nombre_material || 'Desconocido'}</td>
+                    <td>{ajustarFechaAUsuario(reporte.fecha_movimiento)}</td>
                     <td>{reporte.cantidad}</td>
+                    <td>{reporte.nombre_admin || 'N/A'}</td>
                   </tr>
                 ))
               ) : (
                 <tr>
-                  <td colSpan="4">No hay reportes disponibles</td>
+                  <td colSpan="5">No hay reportes disponibles</td>
                 </tr>
               )}
             </tbody>
@@ -195,4 +183,3 @@ const Reportes = () => {
 };
 
 export default Reportes;
-

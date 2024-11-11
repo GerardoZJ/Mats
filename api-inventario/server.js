@@ -7,11 +7,9 @@ const path = require('path');
 const app = express();
 const port = 3000;
 
-
 app.use(express.json());
 app.use(cors());
 app.use('/uploads', express.static('uploads'));
-
 
 const pool = mysql.createPool({
     host: 'srv1247.hstgr.io',
@@ -23,7 +21,6 @@ const pool = mysql.createPool({
     queueLimit: 0
 });
 
-
 const storage = multer.diskStorage({
     destination: (req, file, cb) => {
         cb(null, 'uploads/');
@@ -34,7 +31,7 @@ const storage = multer.diskStorage({
 });
 const upload = multer({ storage: storage });
 
-// Endpoint de login 
+// Endpoint de login
 app.post('/login', (req, res) => {
     const { Usuario, contraseña } = req.body;
 
@@ -57,7 +54,7 @@ app.post('/login', (req, res) => {
     });
 });
 
-// para agregar materiales con imagen
+// Para agregar materiales con imagen
 app.post('/api/materiales', upload.single('imagen'), (req, res) => {
     const { nombre, metros_disponibles, precio } = req.body;
     const imagenPath = req.file ? `/uploads/${req.file.filename}` : null;
@@ -82,7 +79,7 @@ app.post('/api/materiales', upload.single('imagen'), (req, res) => {
     });
 });
 
-//  para obtener materiales con imagen
+// Obtener materiales con imagen
 app.get('/api/materiales', (req, res) => {
     const sql = 'SELECT id_material, nombre, metros_disponibles, precio, imagen AS imagen_url FROM Materiales';
     pool.query(sql, (err, results) => {
@@ -99,7 +96,7 @@ app.get('/api/materiales', (req, res) => {
     });
 });
 
-// editar un material
+// Editar un material
 app.put('/api/materiales/:id', (req, res) => {
     const { id } = req.params;
     const { nombre, metros_disponibles, precio } = req.body;
@@ -119,19 +116,16 @@ app.put('/api/materiales/:id', (req, res) => {
     });
 });
 
-
-// eliminar material con eliminación de movimientos asociados
+// Eliminar material con eliminación de movimientos asociados
 app.delete('/api/materiales/:id', async (req, res) => {
     const { id } = req.params;
     const connection = await pool.promise().getConnection();
     await connection.beginTransaction();
 
     try {
-     
         const deleteMovimientosSql = 'DELETE FROM MovimientosInventario WHERE id_material = ?';
         await connection.query(deleteMovimientosSql, [id]);
 
-     
         const deleteMaterialSql = 'DELETE FROM Materiales WHERE id_material = ?';
         const [result] = await connection.query(deleteMaterialSql, [id]);
 
@@ -151,42 +145,90 @@ app.delete('/api/materiales/:id', async (req, res) => {
 });
 
 
-//  obtener el historial de movimientos
-app.get('/api/movimientos', (req, res) => {
-    const sql = 'SELECT id_movimiento, id_material, tipo_movimiento, cantidad, fecha_movimiento, descripcion FROM MovimientosInventario ORDER BY fecha_movimiento DESC';
-    pool.query(sql, (err, results) => {
-        if (err) {
-            console.error('Error al obtener historial de movimientos:', err);
-            return res.status(500).json({ error: 'Error en el servidor al obtener historial de movimientos', details: err.message });
-        }
-        res.json(results);
-    });
-});
+// Endpoint para obtener movimientos con el nombre del administrador
 
-//agregar un nuevo movimiento y actualizar la cantidad de materiales
+// Endpoint para obtener movimientos con ajuste de zona horaria
+const moment = require('moment-timezone');
+app.get('/api/movimientos', (req, res) => {
+    const { timeZone } = req.query; // Recibe la zona horaria del usuario desde el frontend
+    const sql = `
+      SELECT 
+        MovimientosInventario.*, 
+        Materiales.nombre AS nombre_material,
+        Administrador.Usuario AS nombre_admin 
+      FROM 
+        MovimientosInventario 
+      LEFT JOIN 
+        Materiales ON MovimientosInventario.id_material = Materiales.id_material
+      LEFT JOIN 
+        Administrador ON MovimientosInventario.id_Admin = Administrador.id_Admin 
+      ORDER BY 
+        MovimientosInventario.fecha_movimiento DESC
+    `;
+    
+    pool.query(sql, (err, results) => {
+      if (err) {
+        console.error('Error al obtener historial de movimientos:', err);
+        return res.status(500).json({ error: 'Error en el servidor al obtener historial de movimientos', details: err.message });
+      }
+  
+      // Ajustar la fecha de cada movimiento a la zona horaria del usuario
+      const adjustedResults = results.map((movimiento) => ({
+        ...movimiento,
+        fecha_movimiento: movimiento.fecha_movimiento 
+          ? moment(movimiento.fecha_movimiento).tz(timeZone || 'America/Mexico_City').format('YYYY-MM-DD HH:mm:ss')
+          : 'Fecha no disponible'
+      }));
+  
+      res.json(adjustedResults);
+    });
+  });
+  
+
+
+
+// Agregar un nuevo movimiento
 app.post('/api/movimientos', async (req, res) => {
-    const { id_material, tipo_movimiento, cantidad, fecha_movimiento, descripcion } = req.body;
+    const { id_material, tipo_movimiento, cantidad, fecha_movimiento, descripcion, id_Admin } = req.body;
+
+    // Validación de campos
+    if (!id_material || !tipo_movimiento || !cantidad || !fecha_movimiento || !descripcion || !id_Admin) {
+        return res.status(400).json({ error: 'Todos los campos son obligatorios, incluyendo id_Admin.' });
+    }
 
     const connection = await pool.promise().getConnection();
     await connection.beginTransaction();
-    
+
     try {
-        const sqlInsert = 'INSERT INTO MovimientosInventario (id_material, tipo_movimiento, cantidad, fecha_movimiento, descripcion) VALUES (?, ?, ?, ?, ?)';
-        await connection.query(sqlInsert, [id_material, tipo_movimiento, cantidad, fecha_movimiento, descripcion]);
+        // Primero, obtenemos el stock actual del material
+        const [material] = await connection.query('SELECT metros_disponibles FROM Materiales WHERE id_material = ?', [id_material]);
+        
+        if (!material.length) {
+            throw new Error('Material no encontrado');
+        }
+
+        const metrosDisponibles = material[0].metros_disponibles;
+
+        // Si es un movimiento de salida, comprobamos el stock
+        if (tipo_movimiento === 'salida') {
+            if (metrosDisponibles === 0) {
+                return res.status(400).json({ error: 'No hay stock disponible.' });
+            } else if (metrosDisponibles < cantidad) {
+                return res.status(400).json({ error: 'Productos insuficientes en stock.' });
+            }
+        }
+
+        // Procesa el movimiento
+        const sqlInsert = 'INSERT INTO MovimientosInventario (id_material, tipo_movimiento, cantidad, fecha_movimiento, descripcion, id_Admin) VALUES (?, ?, ?, ?, ?, ?)';
+        await connection.query(sqlInsert, [id_material, tipo_movimiento, cantidad, fecha_movimiento, descripcion, id_Admin]);
 
         const sqlUpdate = tipo_movimiento === 'entrada' 
             ? 'UPDATE Materiales SET metros_disponibles = metros_disponibles + ? WHERE id_material = ?'
             : 'UPDATE Materiales SET metros_disponibles = metros_disponibles - ? WHERE id_material = ?';
-        
+
         await connection.query(sqlUpdate, [cantidad, id_material]);
 
-        const [material] = await connection.query('SELECT metros_disponibles FROM Materiales WHERE id_material = ?', [id_material]);
-        if (material[0].metros_disponibles < 0) {
-            throw new Error('No hay suficiente material disponible para esta salida.');
-        }
-
         await connection.commit();
-
         res.status(201).json({ message: 'Movimiento registrado exitosamente' });
     } catch (error) {
         await connection.rollback();
@@ -197,34 +239,8 @@ app.post('/api/movimientos', async (req, res) => {
     }
 });
 
-//  para actualizar un movimiento
-app.put('/api/movimientos/:id', (req, res) => {
-    const { id } = req.params;
-    const { id_material, tipo_movimiento, cantidad, fecha_movimiento, descripcion } = req.body;
-    const sql = 'UPDATE MovimientosInventario SET id_material = ?, tipo_movimiento = ?, cantidad = ?, fecha_movimiento = ?, descripcion = ? WHERE id_movimiento = ?';
-    pool.query(sql, [id_material, tipo_movimiento, cantidad, fecha_movimiento, descripcion, id], (err, results) => {
-        if (err) {
-            console.error('Error al actualizar movimiento:', err);
-            return res.status(500).json({ error: 'Error en el servidor al actualizar movimiento', details: err.message });
-        }
-        res.json({ message: 'Movimiento actualizado', id_movimiento: id });
-    });
-});
 
-// para eliminar un movimiento
-app.delete('/api/movimientos/:id', (req, res) => {
-    const { id } = req.params;
-    const sql = 'DELETE FROM MovimientosInventario WHERE id_movimiento = ?';
-    pool.query(sql, [id], (err, results) => {
-        if (err) {
-            console.error('Error al eliminar movimiento:', err);
-            return res.status(500).json({ error: 'Error en el servidor al eliminar movimiento', details: err.message });
-        }
-        res.json({ message: 'Movimiento eliminado', id_movimiento: id });
-    });
-});
-
-
+// Iniciar el servidor
 app.listen(port, () => {
     console.log(`Servidor corriendo en el puerto: ${port}`);
 });

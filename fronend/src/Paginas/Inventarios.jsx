@@ -1,8 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import './Desing/InventariosDesing.css';
+import { useAuth } from '../Componentes/AuthContextt'; // Asegúrate de tener este contexto
 
 const Inventarios = () => {
+    const { user } = useAuth(); // Obtener el usuario autenticado
     const [materiales, setMateriales] = useState([]);
     const [selectedMaterial, setSelectedMaterial] = useState('');
     const [cantidad, setCantidad] = useState('');
@@ -40,20 +42,21 @@ const Inventarios = () => {
         e.preventDefault();
         setError('');
         setSuccessMessage('');
-
+    
         if (!selectedMaterial || !cantidad) {
             setError('Todos los campos son obligatorios.');
             return;
         }
-
+    
         const movimiento = {
             id_material: selectedMaterial,
             tipo_movimiento: tipoMovimiento,
             cantidad: parseInt(cantidad, 10),
             fecha_movimiento: new Date().toISOString().slice(0, 19).replace('T', ' '),
-            descripcion: `Movimiento de ${tipoMovimiento === 'entrada' ? 'entrada' : 'salida'} de material`
+            descripcion: `Movimiento de ${tipoMovimiento === 'entrada' ? 'entrada' : 'salida'} de material`,
+            id_Admin: user?.id_Admin // Asegúrate de que `id_Admin` esté presente
         };
-
+    
         try {
             const response = await axios.post('http://localhost:3000/api/movimientos', movimiento);
             setSuccessMessage(response.data.message);
@@ -61,11 +64,16 @@ const Inventarios = () => {
             setCantidad('');
             fetchHistorial();
         } catch (error) {
-            console.error('Error al registrar movimiento:', error);
-            setError('Error al registrar movimiento. Inténtalo nuevamente.');
+            if (error.response && error.response.status === 400) {
+                // Mostrar mensaje de error específico desde el backend
+                setError(error.response.data.error);
+            } else {
+                setError('Error al registrar movimiento. Inténtalo nuevamente.');
+            }
         }
     };
-
+    
+    
     const formatFecha = (fecha) => {
         return new Date(fecha).toLocaleString('es-ES', {
             day: '2-digit',
@@ -108,27 +116,32 @@ const Inventarios = () => {
             </form>
 
             <div className="historial-container">
-                <div className="historial-section">
-                    <h4>Entradas</h4>
-                    <div className="historial-list">
-                        {historial.filter(item => item.tipo_movimiento === 'entrada').map((item) => (
-                            <div key={item.id_movimiento} className="historial-item">
-                                <p>{formatFecha(item.fecha_movimiento)} - {item.descripcion}: {item.cantidad}</p>
-                            </div>
-                        ))}
-                    </div>
+    <div className="historial-section">
+        <h4>Entradas</h4>
+        <div className="historial-list">
+            {historial.filter(item => item.tipo_movimiento === 'entrada').map((item) => (
+                <div key={item.id_movimiento} className="historial-item">
+                    <p>{formatFecha(item.fecha_movimiento)} - Movimiento de entrada de material: {item.cantidad} metros</p>
+                    <p><strong>Material:</strong> {item.nombre_material || 'Desconocido'}</p>
+                    <p><strong>Realizado por:</strong> {item.nombre_admin || 'N/A'}</p>
                 </div>
-                <div className="historial-section">
-                    <h4>Salidas</h4>
-                    <div className="historial-list">
-                        {historial.filter(item => item.tipo_movimiento === 'salida').map((item) => (
-                            <div key={item.id_movimiento} className="historial-item">
-                                <p>{formatFecha(item.fecha_movimiento)} - {item.descripcion}: {item.cantidad}</p>
-                            </div>
-                        ))}
-                    </div>
+            ))}
+        </div>
+    </div>
+    <div className="historial-section">
+        <h4>Salidas</h4>
+        <div className="historial-list">
+            {historial.filter(item => item.tipo_movimiento === 'salida').map((item) => (
+                <div key={item.id_movimiento} className="historial-item">
+                    <p>{formatFecha(item.fecha_movimiento)} - Movimiento de salida de material: {item.cantidad} metros</p>
+                    <p><strong>Material:</strong> {item.nombre_material || 'Desconocido'}</p>
+                    <p><strong>Realizado por:</strong> {item.nombre_admin || 'N/A'}</p>
                 </div>
-            </div>
+            ))}
+        </div>
+    </div>
+</div>
+
         </div>
     );
 };

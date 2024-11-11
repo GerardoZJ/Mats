@@ -16,21 +16,22 @@ const Login = () => {
     setError('');
 
     try {
-      const response = await axios.post('http://localhost:3000/login', {
-        Usuario,
-        contraseña,
-      });
-      console.log('Login exitoso:', response.data);
-      login(response.data);
-      navigate('/Catalogo');
+        const response = await axios.post('http://localhost:3000/login', {
+            Usuario,
+            contraseña,
+        });
+        console.log('Login exitoso:', response.data);
+        login(response.data.user); 
+        navigate('/Catalogo');
     } catch (err) {
-      if (err.response && err.response.status === 401) {
-        setError('Credenciales incorrectas. Inténtalo de nuevo.');
-      } else {
-        setError('Error al conectar con el servidor. Inténtalo más tarde.');
-      }
+        if (err.response && err.response.status === 401) {
+            setError('Credenciales incorrectas. Inténtalo de nuevo.');
+        } else {
+            setError('Error al conectar con el servidor. Inténtalo más tarde.');
+        }
     }
-  };
+};
+
 
   return (
     <div className="login-page">
