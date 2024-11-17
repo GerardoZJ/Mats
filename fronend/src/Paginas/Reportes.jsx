@@ -15,18 +15,14 @@ const Reportes = () => {
 
   const obtenerReporte = async () => {
     try {
-      const response = await axios.get('http://localhost:3000/api/movimientos');
+      const timeZone = Intl.DateTimeFormat().resolvedOptions().timeZone; // Obtener la zona horaria local
+      const response = await axios.get(`http://localhost:3000/api/movimientos?timeZone=${timeZone}`);
       setReportes(response.data);
     } catch (error) {
       console.error('Error al obtener el reporte:', error);
     }
   };
-
-  // Convertir fecha UTC de la base de datos a la zona horaria local
-  const ajustarFechaAUsuario = (fechaUTC) => {
-    const fechaLocal = new Date(fechaUTC);
-    return fechaLocal.toLocaleDateString('es-ES');
-  };
+  
 
   const manejarFiltroPorFechaExacta = () => {
     if (!fechaExacta) {
@@ -34,15 +30,15 @@ const Reportes = () => {
       return;
     }
 
-    const fechaSeleccionada = new Date(fechaExacta).toLocaleDateString('es-ES');
+    const fechaSeleccionada = new Date(fechaExacta).toISOString().split("T")[0];
 
     const entradas = reportes.filter((reporte) => {
-      const fechaMovimiento = new Date(reporte.fecha_movimiento).toLocaleDateString('es-ES');
+      const fechaMovimiento = new Date(reporte.fecha_movimiento).toISOString().split("T")[0];
       return reporte.tipo_movimiento === 'entrada' && fechaMovimiento === fechaSeleccionada;
     });
 
     const salidas = reportes.filter((reporte) => {
-      const fechaMovimiento = new Date(reporte.fecha_movimiento).toLocaleDateString('es-ES');
+      const fechaMovimiento = new Date(reporte.fecha_movimiento).toISOString().split("T")[0];
       return reporte.tipo_movimiento === 'salida' && fechaMovimiento === fechaSeleccionada;
     });
 
@@ -56,36 +52,48 @@ const Reportes = () => {
 
   const manejarFiltroPeriodico = () => {
     const hoy = new Date();
+    hoy.setHours(0, 0, 0, 0); // Resetear la hora para comparar solo por fecha
     let fechaInicio;
 
     switch (tipoFiltro) {
       case 'Dia':
-        fechaInicio = new Date(hoy.setHours(0, 0, 0, 0));
+        fechaInicio = hoy;
         break;
       case 'Semana':
-        fechaInicio = new Date(hoy.setDate(hoy.getDate() - 7)).setHours(0, 0, 0, 0);
+        fechaInicio = new Date(hoy);
+        fechaInicio.setDate(hoy.getDate() - 7);
         break;
       case 'Mes':
-        fechaInicio = new Date(hoy.setDate(hoy.getDate() - 30)).setHours(0, 0, 0, 0);
+        fechaInicio = new Date(hoy);
+        fechaInicio.setDate(hoy.getDate() - 30);
         break;
       default:
         return;
     }
 
-    const entradas = reportes.filter(
-      (reporte) =>
-        reporte.tipo_movimiento === 'entrada' &&
-        new Date(reporte.fecha_movimiento).getTime() >= fechaInicio
-    );
+    const entradas = reportes.filter((reporte) => {
+      const fechaMovimiento = new Date(reporte.fecha_movimiento);
+      return reporte.tipo_movimiento === 'entrada' && fechaMovimiento >= fechaInicio;
+    });
 
-    const salidas = reportes.filter(
-      (reporte) =>
-        reporte.tipo_movimiento === 'salida' &&
-        new Date(reporte.fecha_movimiento).getTime() >= fechaInicio
-    );
+    const salidas = reportes.filter((reporte) => {
+      const fechaMovimiento = new Date(reporte.fecha_movimiento);
+      return reporte.tipo_movimiento === 'salida' && fechaMovimiento >= fechaInicio;
+    });
 
     setEntradasFiltradas(entradas);
     setSalidasFiltradas(salidas);
+  };
+
+  const ajustarFechaAUsuario = (fechaUTC) => {
+    const fechaLocal = new Date(fechaUTC);
+    return fechaLocal.toLocaleDateString('es-ES', {
+      day: '2-digit',
+      month: '2-digit',
+      year: 'numeric',
+      hour: '2-digit',
+      minute: '2-digit'
+    });
   };
 
   return (
