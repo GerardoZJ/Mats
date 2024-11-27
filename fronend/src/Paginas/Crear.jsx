@@ -21,13 +21,13 @@ const Crear = () => {
     }
 
     try {
-      const response = await axios.post('http://localhost:3000/api/materiales', formData, {
+      const response = await axios.post('https://apim-dg8z.onrender.com/api/materiales', formData, {
         headers: {
           'Content-Type': 'multipart/form-data',
         },
       });
       console.log('Material agregado:', response.data);
-      navigate('/Catalogo'); // Redirige al catálogo después de crear el material
+      navigate('/Catalogo'); 
     } catch (error) {
       console.error('Error al agregar el material:', error);
     }

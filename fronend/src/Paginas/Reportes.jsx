@@ -5,7 +5,7 @@ import './Desing/ReportesDesing.css';
 const Reportes = () => {
   const [reportes, setReportes] = useState([]);
   const [fechaExacta, setFechaExacta] = useState('');
-  const [tipoFiltro, setTipoFiltro] = useState('Dia');
+  const [tipoFiltro, setTipoFiltro] = useState('Semana'); 
   const [entradasFiltradas, setEntradasFiltradas] = useState([]);
   const [salidasFiltradas, setSalidasFiltradas] = useState([]);
 
@@ -15,8 +15,8 @@ const Reportes = () => {
 
   const obtenerReporte = async () => {
     try {
-      const timeZone = Intl.DateTimeFormat().resolvedOptions().timeZone; // Obtener la zona horaria local
-      const response = await axios.get(`http://localhost:3000/api/movimientos?timeZone=${timeZone}`);
+      const timeZone = Intl.DateTimeFormat().resolvedOptions().timeZone; 
+      const response = await axios.get(`https://apim-dg8z.onrender.com/api/movimientos?timeZone=${timeZone}`);
       setReportes(response.data);
     } catch (error) {
       console.error('Error al obtener el reporte:', error);
@@ -52,38 +52,52 @@ const Reportes = () => {
 
   const manejarFiltroPeriodico = () => {
     const hoy = new Date();
-    hoy.setHours(0, 0, 0, 0); // Resetear la hora para comparar solo por fecha
+    hoy.setHours(0, 0, 0, 0); 
     let fechaInicio;
-
+  
     switch (tipoFiltro) {
-      case 'Dia':
-        fechaInicio = hoy;
-        break;
       case 'Semana':
         fechaInicio = new Date(hoy);
-        fechaInicio.setDate(hoy.getDate() - 7);
+        fechaInicio.setDate(hoy.getDate() - 7); 
         break;
       case 'Mes':
         fechaInicio = new Date(hoy);
-        fechaInicio.setDate(hoy.getDate() - 30);
+        fechaInicio.setMonth(hoy.getMonth() - 1); 
         break;
       default:
+        alert("Por favor selecciona un filtro válido.");
         return;
     }
+  
+    console.log('Tipo de Filtro:', tipoFiltro);
+    console.log('Fecha de Inicio:', fechaInicio);
+    console.log('Hoy:', hoy);
+  
 
     const entradas = reportes.filter((reporte) => {
       const fechaMovimiento = new Date(reporte.fecha_movimiento);
       return reporte.tipo_movimiento === 'entrada' && fechaMovimiento >= fechaInicio;
     });
-
+  
     const salidas = reportes.filter((reporte) => {
       const fechaMovimiento = new Date(reporte.fecha_movimiento);
       return reporte.tipo_movimiento === 'salida' && fechaMovimiento >= fechaInicio;
     });
-
+  
+    console.log('Entradas filtradas:', entradas);
+    console.log('Salidas filtradas:', salidas);
+  
+    if (entradas.length === 0 && salidas.length === 0) {
+      alert("No hay reportes disponibles para este período.");
+    }
+  
     setEntradasFiltradas(entradas);
     setSalidasFiltradas(salidas);
   };
+  
+
+  
+  
 
   const ajustarFechaAUsuario = (fechaUTC) => {
     const fechaLocal = new Date(fechaUTC);
@@ -105,10 +119,11 @@ const Reportes = () => {
           <h3 className='texto'>Filtrar Periódicamente</h3>
           <label>Tipo de Filtro:</label>
           <select value={tipoFiltro} onChange={(e) => setTipoFiltro(e.target.value)}>
-            <option value="Dia">Día</option>
-            <option value="Semana">Semana</option>
-            <option value="Mes">Mes</option>
-          </select>
+  <option value="Semana">Semana</option>
+  <option value="Mes">Mes</option>
+</select>
+
+
           <button onClick={manejarFiltroPeriodico}>Filtrar Periódicamente</button>
           
           <h3 className="texto-negro">Filtrar por Fecha Exacta</h3>

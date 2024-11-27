@@ -49,3 +49,67 @@ h3 {
 .historial-item:last-child {
     border-bottom: none;
 }
+@media (max-width: 576px) {
+    body {
+      font-size: 0.9rem;
+    }
+  
+    .catalogo-container {
+      padding: 10px;
+    }
+  
+    .material-card {
+      width: 100%;
+      padding: 15px;
+    }
+  
+    .material-name {
+      font-size: 1.2rem;
+    }
+  
+    .actions button {
+      width: 100%;
+      padding: 12px;
+    }
+  }
+  
+
+  @media (max-width: 768px) {
+    .catalogo-container {
+      padding: 10px;
+    }
+  
+    .material-card {
+      width: 48%;
+    }
+  
+    .material-name {
+      font-size: 1.4rem;
+    }
+  }
+  
+
+  @media (max-width: 1024px) {
+    .material-card {
+      width: 32%;
+    }
+  
+    .material-name {
+      font-size: 1.6rem;
+    }
+  
+    .actions button {
+      width: 45%;
+    }
+  }
+  
+
+  @media (min-width: 1200px) {
+    .catalogo-container {
+      max-width: 1000px;
+    }
+  
+    .material-card {
+      width: 23%;
+    }
+  }

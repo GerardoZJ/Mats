@@ -16,7 +16,7 @@ const Catalogo = () => {
   useEffect(() => {
     const fetchMateriales = async () => {
       try {
-        const response = await axios.get('http://localhost:3000/api/materiales');
+        const response = await axios.get('https://apim-dg8z.onrender.com/api/materiales');
         setMateriales(response.data);
       } catch (error) {
         console.error('Error al obtener materiales:', error);
@@ -28,7 +28,7 @@ const Catalogo = () => {
   const toggleEstado = async (id, currentEstado) => {
     try {
         const newEstado = currentEstado ? 0 : 1;
-        await axios.put(`http://localhost:3000/api/materiales/${id}/estado`, { estado: newEstado });
+        await axios.put(`https://apim-dg8z.onrender.com/api/materiales/${id}/estado`, { estado: newEstado });
         setMateriales(materiales.map(material =>
             material.id_material === id ? { ...material, estado: newEstado } : material
         ));
@@ -40,7 +40,7 @@ const Catalogo = () => {
   const handleEliminar = async (id) => {
     if (window.confirm("¿Estás seguro de que deseas eliminar este material?")) {
       try {
-        await axios.delete(`http://localhost:3000/api/materiales/${id}`);
+        await axios.delete(`https://apim-dg8z.onrender.com/api/materiales/${id}`);
         setMateriales(materiales.filter(material => material.id_material !== id));
       } catch (error) {
         console.error('Error al eliminar material:', error);
@@ -67,7 +67,7 @@ const Catalogo = () => {
 
   const handleGuardar = async (id) => {
     try {
-      await axios.put(`http://localhost:3000/api/materiales/${id}`, formValues);
+      await axios.put(`https://apim-dg8z.onrender.com/api/materiales/${id}`, formValues);
       setMateriales(materiales.map(material => 
         material.id_material === id ? { ...material, ...formValues } : material
       ));
@@ -109,6 +109,7 @@ const Catalogo = () => {
                       name="metros_disponibles"
                       value={formValues.metros_disponibles}
                       onChange={handleChange}
+                      readOnly
                     />
                   </label>
                   <label>

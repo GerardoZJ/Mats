@@ -15,7 +15,7 @@ const Inventarios = () => {
 
     const fetchHistorial = async () => {
         try {
-            const response = await axios.get('http://localhost:3000/api/movimientos');
+            const response = await axios.get('https://apim-dg8z.onrender.com/api/movimientos');
             setHistorial(response.data);
         } catch (error) {
             console.error('Error al obtener historial:', error);
@@ -26,8 +26,8 @@ const Inventarios = () => {
     useEffect(() => {
         const fetchMateriales = async () => {
             try {
-                // Solicita solo materiales activos para la selección de movimientos
-                const response = await axios.get('http://localhost:3000/api/materiales?activos=true');
+                
+                const response = await axios.get('https://apim-dg8z.onrender.com/api/materiales?activos=true');
                 setMateriales(response.data);
             } catch (error) {
                 console.error('Error al obtener materiales:', error);
@@ -55,11 +55,11 @@ const Inventarios = () => {
             cantidad: parseInt(cantidad, 10),
             fecha_movimiento: new Date().toISOString().slice(0, 19).replace('T', ' '),
             descripcion: `Movimiento de ${tipoMovimiento === 'entrada' ? 'entrada' : 'salida'} de material`,
-            id_Admin: user?.id_Admin // Asegúrate de que `id_Admin` esté presente
+            id_Admin: user?.id_Admin 
         };
 
         try {
-            const response = await axios.post('http://localhost:3000/api/movimientos', movimiento);
+            const response = await axios.post('https://apim-dg8z.onrender.com/api/movimientos', movimiento);
             setSuccessMessage(response.data.message);
             setSelectedMaterial('');
             setCantidad('');

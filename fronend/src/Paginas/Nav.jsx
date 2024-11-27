@@ -2,7 +2,7 @@ import React from 'react';
 import { Link, Outlet } from 'react-router-dom';
 import { useAuth } from '../Componentes/AuthContextt';
 import './Desing/NavDesing.css';
-import logo from '../../public/Logo.png'; // Ruta del logo
+import logo from '../../public/Logo.png'; 
 
 const Nav = () => {
   const { isAuthenticated, logout } = useAuth();
